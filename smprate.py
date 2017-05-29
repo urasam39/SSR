@@ -1,11 +1,11 @@
 from fractions import Fraction
 import numpy as np
-import scipy as sp
 import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import scipy.signal as sg
 import soundfile as sf
+matplotlib.use("Agg")
+
 
 if __name__ == '__main__':
     fs_target = 44100
