@@ -5,6 +5,7 @@ from tqdm import tqdm
 import math
 import numpy as np
 import array
+from scipy import signal, interpolate
 
 
 # {{{
@@ -86,15 +87,36 @@ def clopwave():
 
 
 def down_and_save():
+    # save numpy array
     X_target = []
-    for file_name in tqdm(os.listdir(save_dir_clp_path)):
+    for file_name in tqdm(os.listdir(data_dir_train)):
         if file_name.startswith("p") and file_name.endswith("wav"):
-            wave_file = wave.open(save_dir_clp_path+file_name)
+            wave_file = wave.open(data_dir_train+file_name)
             x = down_sampe(wave_file)
+            save_wav(x, data_dir_low_path+"train/", file_name, sample_rate_low)
             X_target.append(x)
-    np.save(numpy_dir+"xlow.npy", np.array(X_target))
+    np.save(numpy_dir+"xlowtrain.npy", np.array(X_target))
     print(np.array(X_target).shape)
 
+
+def mvfiles():
+    """mv file dayo"""
+    file_list = os.listdir(save_dir_clp_path)
+    for file_name in tqdm(file_list):
+        if file_name.startswith("p3"):
+            os.system('mv '+save_dir_clp_path+file_name+" "+data_dir_test)
+
+
+def up_sample_cubic(x):
+    # imput:np.array low data, return:np.array hith data
+    x_high = []
+    for i in tqdm(range(len(x))):
+        # print(x[i,:].shape)
+        y_interf = interpolate.CubicSpline(np.linspace(0, data_length/2-1, data_length/2),
+                                           x[i,:])
+        y_inter = y_interf(np.linspace(0, data_length/2-1, data_length)).astype(np.int16)
+        x_high.append(y_inter)
+    return np.array(x_high)
 
 if __name__ == '__main__':
     sample_rate_low = 24000
@@ -107,18 +129,35 @@ if __name__ == '__main__':
     save_dir_clp_path = home_dir + "sounds/VCTKclpraw/" # all 6000 length data
     # down sample
     data_dir_low_path = home_dir + "sounds/VCTKlow/" # down sample data
+    data_dir_train = home_dir + "sounds/VCTKclptrain/" # clp data
+    data_dir_test = home_dir + "sounds/VCTKclptest/" # clp data
     numpy_dir = home_dir + "sounds/VCTKnumpy/"
-    down_and_save()
 
+    X_target = []
+    file_list = os.listdir(data_dir_train)
+    for file_name in tqdm(file_list):
+        if file_name.startswith("p") and file_name.endswith("wav"):
+            wave_file = wave.open(data_dir_train+file_name)
+            x = wave_file.readframes(wave_file.getnframes())
+            x = np.frombuffer(x, dtype="int16")
+            X_target.append(x)
+    np.save(numpy_dir+"xtrain.npy", np.array(X_target))
+    print(np.array(X_target).shape)
 
-    # # down scale and upscale with bicubic
-    # data_dir_clp_path = save_dir_clp_path
-    # save_dir_data_path = home_dir + "images/srcnndata/inputdata/"
-    # file_list = os.listdir(data_dir_clp_path)
-    # for file_name in tqdm(file_list):
-    #     down_scale(file_name, data_dir_clp_path, save_dir_data_path)
+    # mvfiles()
+    # down_and_save()
+    # up_sample_cubic()
+    # x = np.load(numpy_dir+"xlowtrain.npy")
+    # up_sample_cubic(x)
+    # x_up = up_sample_cubic(x)
+    # np.save(numpy_dir+"xcutrain.npy", x_up)
+    # print(x_up.shape)
 
-    # save_numpy("Xtrain33.npy",
-    #            save_dir_data_path, '/home/data/urasam/images/srcnndata/')
-    # save_numpy("Ytrain33.npy",
-    #            save_dir_clp_path, '/home/data/urasam/images/srcnndata/')
+    # t_low = np.linspace(0, 2999, 3000)
+    # t_high = np.linspace(0, 2999, 6000)
+    # y = np.sin(t_low)
+    # y = t_low
+    # cs = interpolate.CubicSpline(t_low, y)
+    # y_inter = cs(t_high)
+    #print(y)
+    #print(y_inter)
