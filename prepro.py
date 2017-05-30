@@ -56,13 +56,13 @@ def down_sampe(wave_file):
     return x
 
 
-def save_wav(x, save_dir_path, file_name):
+def save_wav(x, save_dir_path, file_name, sample_rate):
     # input:np.array, output:wav file
     w = wave.Wave_write(save_dir_path + file_name)
     w.setparams((
         1,
         2,
-        sample_rate_low,
+        sample_rate,
         len(x),
         "NONE", "not commpressed"
         ))
@@ -70,30 +70,46 @@ def save_wav(x, save_dir_path, file_name):
     w.close()
 
 
+def clopwave():
+    dir_list = os.listdir(data_dir_raw_path)
+    for dir_name in tqdm(dir_list):
+        if dir_name.startswith("p"):
+            file_list = os.listdir(data_dir_raw_path+dir_name)
+            for file_name in file_list:
+                if file_name.startswith("p") and file_name.endswith("wav"):
+                    # print(data_dir_raw_path+dir_name+"/"+file_name)
+                    wave_file = wave.open(data_dir_raw_path+dir_name+"/"+file_name)
+                    x = wave_file.readframes(wave_file.getnframes())
+                    x = np.frombuffer(x, dtype="int16")
+                    for i in range(len(x)/data_length):
+                        save_wav(x[i*data_length:(i+1)*data_length], save_dir_clp_path, file_name.split(".")[0]+str(i)+".wav", sample_rate_high)
+
+
+def down_and_save():
+    X_target = []
+    for file_name in tqdm(os.listdir(save_dir_clp_path)):
+        if file_name.startswith("p") and file_name.endswith("wav"):
+            wave_file = wave.open(save_dir_clp_path+file_name)
+            x = down_sampe(wave_file)
+            X_target.append(x)
+    np.save(numpy_dir+"xlow.npy", np.array(X_target))
+    print(np.array(X_target).shape)
+
+
 if __name__ == '__main__':
     sample_rate_low = 24000
-    if len(sys.argv) != 3:
-        print("usage: python prepro.py [sound file] savedir")
-        sys.exit(1)
-    file_name = sys.argv[1]
-    save_dir_path = sys.argv[2]
-    save_dir_path = save_dir_path + "/"
+    sample_rate_high = 48000
+    data_length = 6000
 
-    wave_file = wave.open(file_name, "r")
-    print("param")
-    print(wave_file.getparams())
-
-    x = down_sampe(wave_file)
-    save_wav(x, save_dir_path, "test.wav")
-
-    # clop pictures
+    # clop wave file
     home_dir = "/home/data/urasam/"
-    data_dir_raw_path = home_dir + "Image-Super-Resolution/input_images/"
-    save_dir_clp_path = home_dir + "images/srcnndata/valclp_raw33/"
-    # file_list = os.listdir(data_dir_raw_path)
-    # for file_name in tqdm(file_list):
-    #     # print(file_name)
-    #     clopfunc(file_name, data_dir_raw_path, save_dir_clp_path, 33, 14)
+    data_dir_raw_path = home_dir + "sounds/VCTK-Corpus/wav48/" # raw data
+    save_dir_clp_path = home_dir + "sounds/VCTKclpraw/" # all 6000 length data
+    # down sample
+    data_dir_low_path = home_dir + "sounds/VCTKlow/" # down sample data
+    numpy_dir = home_dir + "sounds/VCTKnumpy/"
+    down_and_save()
+
 
     # # down scale and upscale with bicubic
     # data_dir_clp_path = save_dir_clp_path
