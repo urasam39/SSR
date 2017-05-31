@@ -113,26 +113,22 @@ def up_sample_cubic(x):
     for i in tqdm(range(len(x))):
         # print(x[i,:].shape)
         y_interf = interpolate.CubicSpline(np.linspace(0, data_length/2-1, data_length/2),
-                                           x[i,:])
+                                           x[i, :])
         y_inter = y_interf(np.linspace(0, data_length/2-1, data_length)).astype(np.int16)
         x_high.append(y_inter)
     return np.array(x_high)
 
-if __name__ == '__main__':
-    sample_rate_low = 24000
-    sample_rate_high = 48000
-    data_length = 6000
 
-    # clop wave file
-    home_dir = "/home/data/urasam/"
-    data_dir_raw_path = home_dir + "sounds/VCTK-Corpus/wav48/" # raw data
-    save_dir_clp_path = home_dir + "sounds/VCTKclpraw/" # all 6000 length data
-    # down sample
-    data_dir_low_path = home_dir + "sounds/VCTKlow/" # down sample data
-    data_dir_train = home_dir + "sounds/VCTKclptrain/" # clp data
-    data_dir_test = home_dir + "sounds/VCTKclptest/" # clp data
-    numpy_dir = home_dir + "sounds/VCTKnumpy/"
+def up_sample_cubic_1(x):
+    # imput:np.array low data, return:np.array hith data
+    data_length = len(x)*2
+    y_interf = interpolate.CubicSpline(np.linspace(0, data_length/2-1, data_length/2),
+                                       x)
+    y_inter = y_interf(np.linspace(0, data_length/2-1, data_length)).astype(np.int16)
+    return y_inter
 
+
+def numnum():
     X_target = []
     file_list = os.listdir(data_dir_train)
     for file_name in tqdm(file_list):
@@ -143,6 +139,34 @@ if __name__ == '__main__':
             X_target.append(x)
     np.save(numpy_dir+"xtrain.npy", np.array(X_target))
     print(np.array(X_target).shape)
+
+
+if __name__ == '__main__':
+    sample_rate_low = 24000
+    sample_rate_high = 48000
+    data_length = 6000
+
+    # clop wave file
+    home_dir = "/home/data/urasam/"
+    data_dir_raw_path = home_dir + "sounds/VCTK-Corpus/wav48/"  # raw data
+    save_dir_clp_path = home_dir + "sounds/VCTKclpraw/"  # all 6000 length data
+    # down sample
+    data_dir_low_path = home_dir + "sounds/VCTKlow/"  # down sample data
+    data_dir_train = home_dir + "sounds/VCTKclptrain/"  # clp data
+    data_dir_test = home_dir + "sounds/VCTKclptest/"  # clp data
+    numpy_dir = home_dir + "sounds/VCTKnumpy/"
+
+    # wavefile = wave.open('./p225_001.wav')
+    # x = down_sampe(wavefile)
+    # save_wav(x, "./", "p225_001low.wav", sample_rate_low)
+    # x_cu = up_sample_cubic_1(x)
+    # save_wav(x_cu, "./", "p225_001cu.wav", sample_rate_high)
+
+    wavefile = wave.open('/home/data/urasam/sounds/hgannch1.wav')
+    x = wave_file.readframes(wavefile.getnframes())
+    x = np.frombuffer(x, dtype="int16")
+    x = up_sample_cubic_1(x)
+    save_wav(x, "/home/data/urasam/sounds/", "hogehoge.wav", sample_rate_high)
 
     # mvfiles()
     # down_and_save()
