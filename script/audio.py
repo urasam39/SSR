@@ -19,7 +19,7 @@ def sinenois():
     print("Sampling rate :", fs)
     if (len(data.shape) == 1):
         plt.plot(data)
-        plt.savefig("graph.png")
+        plt.savefig("../figures/graph.png")
     if (len(data.shape) == 2 and data.shape[1] == 2):
         left = data[:, 0]
         # right = data[:, 1]
