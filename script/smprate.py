@@ -43,4 +43,4 @@ if __name__ == '__main__':
     ax.set_xlim([3000.0, fs_target + 5000.0])
     ax.set_xlabel("frequency [Hz]")
     ax.set_ylabel("power [dB]")
-    plt.savefig("hoge.png")
+    plt.savefig("../figures/hoge.png")

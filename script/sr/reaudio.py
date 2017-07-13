@@ -6,7 +6,7 @@ from keras.callbacks import ModelCheckpoint, TensorBoard
 
 if __name__ == '__main__':
     model = ResNet50(input_tensor=None, input_shape=(6000, 1))
-    plot(model, to_file="resnetaudio.png", show_shapes=True)
+    plot(model, to_file="../../figures/resnetaudio.png", show_shapes=True)
 
     model.compile(loss='mean_squared_error',
                   optimizer='Adam',
