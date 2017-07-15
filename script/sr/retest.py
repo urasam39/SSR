@@ -22,16 +22,20 @@ if __name__ == '__main__':
                   optimizer='Adam',
                   metrics=['accuracy'])
 
-    x_train = np.load('/home/data/urasam/sounds/VCTKnumpy/xcutest.npy')
-    y_train = np.load('/home/data/urasam/sounds/VCTKnumpy/xtest.npy')
 
-    x_train = x_train.reshape((len(x_train), 6000, 1))
-    y_train = y_train.reshape((len(y_train), 6000, 1))
+    data = np.load("../../output/cuhgann.npy")
+    # x_train = np.load('/home/data/urasam/sounds/VCTKnumpy/xcutest.npy')
+    # y_train = np.load('/home/data/urasam/sounds/VCTKnumpy/xtest.npy')
 
-    print(x_train.shape, y_train.shape)
+    data = data.reshape((len(data), 6000, 1))
+    # x_train = x_train.reshape((len(x_train), 6000, 1))
+    # y_train = y_train.reshape((len(y_train), 6000, 1))
 
-    sr_data = model.predict(x_train)
-    np.save('/home/data/urasam/sounds/output/numpy/' + numpy_name, sr_data)
+    # print(x_train.shape, y_train.shape)
+
+    sr_data = model.predict(data)
+    # np.save('/home/data/urasam/sounds/output/numpy/' + numpy_name, sr_data)
+    np.save("../../output/srhgann.npy", sr_data)
 
     #save_dir = '/home/data/urasam/sounds/weights/resasr/'
     #fpath = save_dir + 'weights_epoch{epoch:02d}-loss{loss:.2f}-acc{acc:.2f}.hdf5'
