@@ -10,11 +10,13 @@ from prepro import save_wav
 
 
 if __name__ == "__main__":
-    data = np.load("/home/data/urasam/sounds/VCTKnumpy/xtrain.npy")
+    # data = np.load("/home/data/urasam/sounds/VCTKnumpy/xtrain.npy")
+    # data = np.load("../output/srhgann.npy")
+    data = np.load("../output/cuhgann.npy")
     print(data.shape)
-    result = np.zeros((2*48000, 1))
+    result = np.zeros((7*48000, 1))
     print(result.shape)
-    for i in range(2*48000/6000):
+    for i in range(7*48000/6000):
         for j in range(6000):
             result[i*6000+j] = data[i, j]
-    save_wav(result, "../output/", "xtrain.wav", 48000)
+    save_wav(result, "../output/", "cuhgann.wav", 48000)
